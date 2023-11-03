@@ -20,8 +20,8 @@ async function getConnection() {
   const connection = await mysql.createConnection({
     host: 'Localhost',
     user: 'root',
-    password: 'Sonrie2132',
-    database: 'netflix',
+    password: '', /*poner cada una su password para arrancar*/
+    database: 'newnetflix' /* 'netflix'*/ ,
   });
   connection.connect();
   return connection;
@@ -46,6 +46,32 @@ server.get('/movies', async (req, res) => {
   console.log(results);
   //4.Cerrar la conexión
   conn.end();
-
-  res.json(results);
+  res.json({
+    success: true,
+    movies: results
+  });
 });
+
+server.get('/movies/genre', async (req, res) => {
+  //1. Obtener los datos de la base de datos
+  const conn = await getConnection();
+  //2. Consulta que quiero a la bd: obtener todas las alumnas
+  const queryMoviesByGenre = 'SELECT genre FROM movies';
+  //3. Ejecutar la consulta
+  const [results, fields] = await conn.query(queryMoviesByGenre);
+  console.log(fields);
+  console.log(results);
+  //4.Cerrar la conexión
+  conn.end();
+  res.json({
+    success: true,
+    movies: results
+  });
+});
+
+
+const staticServerPath = 'web/dist';
+server.use(express.static(staticServerPath));
+
+const pathImgServer = 'src/public-movies-images/';
+server.use(express.static(pathImgServer));
