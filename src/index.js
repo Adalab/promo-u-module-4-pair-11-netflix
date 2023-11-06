@@ -1,7 +1,8 @@
-const mysql = require ("mysql2/promise")
-
 const express = require('express');
 const cors = require('cors');
+const mysql = require ("mysql2/promise");
+require("dotenv").config();
+
 
 // create and config server
 const server = express();
@@ -13,6 +14,7 @@ const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
+server.set("view engine", "ejs");
 
 //conexion a la base de datos
 async function getConnection() {
@@ -20,19 +22,35 @@ async function getConnection() {
   const connection = await mysql.createConnection({
     host: 'Localhost',
     user: 'root',
-    password: '', /*poner cada una su password para arrancar*/
-    database: 'newnetflix' /* 'netflix'*/ ,
+    password: process.env.PASS, /*poner cada una su password para arrancar*/
+    database: process.env.DATABASE /* 'netflix'*/ ,
   });
   connection.connect();
   return connection;
 }
 
-//iniciar el servidor
-const port = 4000;
-server.listen(port, () => {
-  console.log(`Servidor iniciado en http://localhost:${port}`);
-});
+//console.log(process.env);
 
+// server.get('/movies', async (req, res) => {
+//   //1. Obtener los datos de la base de datos
+//   const conex = await getConnection();
+//   const genre = req.query.g;
+//   let moviesList = '';
+//   if (genre === '') {
+//     const query = 'select * from movies';
+//     const [results] = await conex.query(query);
+//     moviesList = results;
+//   } else {
+//     const query = 'select * from movies where genre = ?';
+//     const [results] = await conex.query(query, [genre]);
+//     moviesList = results;
+//   }
+//   res.json({
+//     success: true,
+//     movies: moviesList,
+//   });
+//   conex.end();
+// });
 
 //endpoint para todas las películas
 server.get('/movies', async (req, res) => {
@@ -52,26 +70,29 @@ server.get('/movies', async (req, res) => {
   });
 });
 
-server.get('/movies/genre', async (req, res) => {
-  //1. Obtener los datos de la base de datos
+server.get('/movies/:movieId', async (req, res) => { 
+  console.log(req.params.movieId);
+  const queryMovie = "SELECT * FROM movies WHERE idMovies=?;"
+  //hacer la conexión
   const conn = await getConnection();
-  //2. Consulta que quiero a la bd: obtener todas las alumnas
-  const queryMoviesByGenre = 'SELECT genre FROM movies';
-  //3. Ejecutar la consulta
-  const [results, fields] = await conn.query(queryMoviesByGenre);
-  console.log(fields);
-  console.log(results);
-  //4.Cerrar la conexión
+
+  //Ejecutar la query
+  const [results] = await conn.query(queryMovie, [req.params.movieId]);
+
+  res.render("movie", {foundMovie: results});
+  console.log (queryMovie);
+  console.log(results)
   conn.end();
-  res.json({
-    success: true,
-    movies: results
-  });
-});
+  
+ });
 
 
-const staticServerPath = 'web/dist';
+ //servidor de estáticos
+const staticServerPath = './web/dist';
 server.use(express.static(staticServerPath));
 
-const pathImgServer = 'src/public-movies-images/';
+const pathImgServer = './src/public-movies-images/';
 server.use(express.static(pathImgServer));
+
+const pathServerPublicStyles = '../web/src/styles/index.scss';
+server.use(express.static(pathServerPublicStyles));
