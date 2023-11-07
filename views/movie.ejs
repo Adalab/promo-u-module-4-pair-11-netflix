@@ -4,21 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
-    <link rel="stylesheet" href="aqui-la-ruta-correcta-de-los-estilos.css" />
+    <link rel="stylesheet" href="http://beta.adalab.es/resources/stylesheets/all.css" />
   </head>
   <body>
-    <h1>¡Hola mundo!</h1>
-    <ul>
+    <section class="border--medium"> 
+    <ul class="cards">
       <% if(foundMovie !== "") {%> <% foundMovie.forEach(function(item){ %>
-
-      <li className="card">
-        <h2 className="card__title"><%= item.title %></h2>
-        <p className="card__description"><%= item.genre %></p>
-        <img className="card__img" src="<%= item.image %>" alt="" />
+ 
+      <li class="card">
+        <h2 class="card__title"><%= item.title %></h2>
+       <img class="card__img" src="<%= item.image %>" alt="" />
+       <p class="card__description"><%= item.genre %></p>
         <!-- <p><%= item.category %></p>
         <p><%= item.year %></p> -->
       </li>
       <% }) %> <% } %>
     </ul>
+    </section>
   </body>
 </html>

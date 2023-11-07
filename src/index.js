@@ -9,6 +9,10 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+//Instalar y configuar EL JWT y bcrypt
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 // init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
@@ -31,44 +35,46 @@ async function getConnection() {
 
 //console.log(process.env);
 
-// server.get('/movies', async (req, res) => {
-//   //1. Obtener los datos de la base de datos
-//   const conex = await getConnection();
-//   const genre = req.query.g;
-//   let moviesList = '';
-//   if (genre === '') {
-//     const query = 'select * from movies';
-//     const [results] = await conex.query(query);
-//     moviesList = results;
-//   } else {
-//     const query = 'select * from movies where genre = ?';
-//     const [results] = await conex.query(query, [genre]);
-//     moviesList = results;
-//   }
-//   res.json({
-//     success: true,
-//     movies: moviesList,
-//   });
-//   conex.end();
-// });
-
-//endpoint para todas las películas
 server.get('/movies', async (req, res) => {
   //1. Obtener los datos de la base de datos
-  const conn = await getConnection();
-  //2. Consulta que quiero a la bd: obtener todas las alumnas
-  const queryMovies = 'SELECT * FROM movies';
-  //3. Ejecutar la consulta
-  const [results, fields] = await conn.query(queryMovies);
-  console.log(fields);
-  console.log(results);
-  //4.Cerrar la conexión
-  conn.end();
+  const conex = await getConnection();
+  const genre = req.query.genre;
+  console.log(genre);
+  let moviesList = '';
+  if (genre === ''|| genre=== undefined) {
+    const query = 'select * from movies';
+    const [results] = await conex.query(query);
+    console.log(results);
+    moviesList = results;
+  } else {
+    const query = 'select * from movies where genre = ?';
+    const [results] = await conex.query(query, [genre]);
+    moviesList = results;
+  }
   res.json({
     success: true,
-    movies: results
+    movies: moviesList,
   });
+  conex.end();
 });
+
+//endpoint para todas las películas
+// server.get('/movies', async (req, res) => {
+//   //1. Obtener los datos de la base de datos
+//   const conn = await getConnection();
+//   //2. Consulta que quiero a la bd: obtener todas las alumnas
+//   const queryMovies = 'SELECT * FROM movies';
+//   //3. Ejecutar la consulta
+//   const [results, fields] = await conn.query(queryMovies);
+//   console.log(fields);
+//   console.log(results);
+//   //4.Cerrar la conexión
+//   conn.end();
+//   res.json({
+//     success: true,
+//     movies: results
+//   });
+// });
 
 server.get('/movies/:movieId', async (req, res) => { 
   console.log(req.params.movieId);
@@ -86,7 +92,26 @@ server.get('/movies/:movieId', async (req, res) => {
   
  });
 
+ //Proceso de registro
+//usuario, contraseña, email, nombre....
+server.post("/sign-up", async (req, res) => {
+  const username = req.body.name;
+  const password = req.body.password;
+  const email = req.body.email;
+  //encriptar la contraseña
+  const passwordHashed = await bcrypt.hash(password, 10); //aumentar la seguridad de contraseña encriptada
+  // prepara la consulta sql
+  const sql =
+    "INSERT INTO users( password, email, name) VALUES (?, ? ,?)";
+  const conn = await getConnection();
 
+  const [results] = await conn.query(sql, [passwordHashed, email, username]);
+  conn.end();
+  res.json({
+    success: true,
+    id: results.insertId,
+  });
+});
  //servidor de estáticos
 const staticServerPath = './web/dist';
 server.use(express.static(staticServerPath));
@@ -94,5 +119,5 @@ server.use(express.static(staticServerPath));
 const pathImgServer = './src/public-movies-images/';
 server.use(express.static(pathImgServer));
 
-const pathServerPublicStyles = '../web/src/styles/index.scss';
+const pathServerPublicStyles = '../web/src/styles/index.css';
 server.use(express.static(pathServerPublicStyles));
