@@ -29,6 +29,9 @@ const AllMovies = (props) => {
             <option value="Drama">Drama</option>
             <option value="Comedia">Comedia</option>
             <option value="Crimen">Crimen</option>
+            <option value="Terror">Terror</option>
+            <option value="Accion">Accion</option>
+            <option value="Ciencia Ficcion">Ciencia Ficcion</option>
           </select>
         </div>
 
