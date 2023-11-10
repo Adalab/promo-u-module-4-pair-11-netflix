@@ -12,6 +12,7 @@ server.use(express.json());
 //Instalar y configuar EL JWT y bcrypt
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
+const { log } = require('console');
 
 // init express aplication
 const serverPort = 4000;
@@ -103,15 +104,16 @@ server.post("/sign-up", async (req, res) => {
   // prepara la consulta sql
   const sql =
     "INSERT INTO users( password, email, name) VALUES (?, ? ,?)";
-  const conn = await getConnection();
-
-  const [results] = await conn.query(sql, [passwordHashed, email, username]);
+  const conn = await getConnection(); 
+  const [results] = await conn.query(sql, [passwordHashed, email, username]);  
   conn.end();
   res.json({
     success: true,
     id: results.insertId,
   });
 });
+
+
  //servidor de estáticos
 const staticServerPath = './web/dist';
 server.use(express.static(staticServerPath));
