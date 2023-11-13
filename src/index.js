@@ -8,6 +8,10 @@ const server = express();
 server.use(cors());
 server.use(express.json());
 
+// importar y ejecutar la conexion de mongo
+const dbConnect = require('../config/connection');
+dbConnect();
+
 //Instalar y configuar EL JWT y bcrypt
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
@@ -100,15 +104,17 @@ server.post('/sign-up', async (req, res) => {
   const passwordHashed = await bcrypt.hash(password, 10); //aumentar la seguridad de contraseña encriptada
   // prepara la consulta sql
   const sql =
-    "INSERT INTO users( password, email, name) VALUES (?, ? ,?)";
+    "INSERT INTO users(user, password, email, name, plan_details) VALUES (?, ? ,?, ?, ?)"; //nos daba error porque nos faltaban pasar parametros user y plan_detail, porque eran obligatorios
   const conn = await getConnection(); 
-  const [results] = await conn.query(sql, [passwordHashed, email, username]);  
+  const [results] = await conn.query(sql, [email, passwordHashed, email, username, "Standard"]);  // hemos vuelto a pasar email como valor para no tener que inventar en el post un nuevo valor, y "Standard" es un valor fijo que es obligatorio
   conn.end();
   res.json({
     success: true,
     id: results.insertId,
   });
 });
+
+
 
 
  //servidor de estáticos
