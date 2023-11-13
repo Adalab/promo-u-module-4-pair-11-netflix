@@ -1,8 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const mysql = require ("mysql2/promise");
-require("dotenv").config();
-
+const mysql = require('mysql2/promise');
+require('dotenv').config();
 
 // create and config server
 const server = express();
@@ -10,15 +9,15 @@ server.use(cors());
 server.use(express.json());
 
 //Instalar y configuar EL JWT y bcrypt
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 // init express aplication
 const serverPort = 4000;
 server.listen(serverPort, () => {
   console.log(`Server listening at http://localhost:${serverPort}`);
 });
-server.set("view engine", "ejs");
+server.set('view engine', 'ejs');
 
 //conexion a la base de datos
 async function getConnection() {
@@ -26,8 +25,8 @@ async function getConnection() {
   const connection = await mysql.createConnection({
     host: 'Localhost',
     user: 'root',
-    password: process.env.PASS, /*poner cada una su password para arrancar*/
-    database: process.env.DATABASE /* 'netflix'*/ ,
+    password: process.env.PASS /*poner cada una su password para arrancar*/,
+    database: process.env.DATABASE /* 'netflix'*/,
   });
   connection.connect();
   return connection;
@@ -41,7 +40,7 @@ server.get('/movies', async (req, res) => {
   const genre = req.query.genre;
   console.log(genre);
   let moviesList = '';
-  if (genre === ''|| genre=== undefined) {
+  if (genre === '' || genre === undefined) {
     const query = 'select * from movies';
     const [results] = await conex.query(query);
     console.log(results);
@@ -76,33 +75,31 @@ server.get('/movies', async (req, res) => {
 //   });
 // });
 
-server.get('/movies/:movieId', async (req, res) => { 
+server.get('/movies/:movieId', async (req, res) => {
   console.log(req.params.movieId);
-  const queryMovie = "SELECT * FROM movies WHERE idMovies=?;"
+  const queryMovie = 'SELECT * FROM movies WHERE idMovies=?;';
   //hacer la conexión
   const conn = await getConnection();
 
   //Ejecutar la query
   const [results] = await conn.query(queryMovie, [req.params.movieId]);
 
-  res.render("movie", {foundMovie: results});
-  console.log (queryMovie);
-  console.log(results)
+  res.render('movie', {foundMovie: results});
+  console.log(queryMovie);
+  console.log(results);
   conn.end();
-  
- });
+});
 
- //Proceso de registro
+//Proceso de registro
 //usuario, contraseña, email, nombre....
-server.post("/sign-up", async (req, res) => {
+server.post('/sign-up', async (req, res) => {
   const username = req.body.name;
   const password = req.body.password;
   const email = req.body.email;
   //encriptar la contraseña
   const passwordHashed = await bcrypt.hash(password, 10); //aumentar la seguridad de contraseña encriptada
   // prepara la consulta sql
-  const sql =
-    "INSERT INTO users( password, email, name) VALUES (?, ? ,?)";
+  const sql = 'INSERT INTO users( password, email, name) VALUES (?, ? ,?)';
   const conn = await getConnection();
 
   const [results] = await conn.query(sql, [passwordHashed, email, username]);
@@ -112,7 +109,7 @@ server.post("/sign-up", async (req, res) => {
     id: results.insertId,
   });
 });
- //servidor de estáticos
+//servidor de estáticos
 const staticServerPath = './web/dist';
 server.use(express.static(staticServerPath));
 
@@ -121,3 +118,5 @@ server.use(express.static(pathImgServer));
 
 const pathServerPublicStyles = '../web/src/styles/index.css';
 server.use(express.static(pathServerPublicStyles));
+
+module.exports = server;

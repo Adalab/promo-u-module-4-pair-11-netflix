@@ -27,3 +27,8 @@ INSERT INTO `netflix`.`movies` (`title`, `genre`, `image`, `category`, `year`) V
 INSERT INTO `netflix`.`movies` (`title`, `genre`, `image`, `category`, `year`) VALUES ('La familia Addams', 'Comedia', 'http://localhost:4000/addams.jpg', 'Top 10', '1991');
 INSERT INTO `netflix`.`movies` (`title`, `genre`, `image`, `category`, `year`) VALUES ('Interstellar', 'Ciencia Ficcion', 'http://localhost:4000/interstellar.jpg', 'Top 10', '2014');
 INSERT INTO `netflix`.`movies` (`title`, `genre`, `image`, `category`, `year`) VALUES ('Psycho', 'Terror', 'http://localhost:4000/psycho.jpeg', 'Top 10', '1960');
+
+DESCRIBE users; /*esto sirve para mostrar los fieldset de la tabla*/
+
+ALTER TABLE `netflix`.`users` 
+CHANGE COLUMN `password` `password` VARCHAR(250) NOT NULL ;
