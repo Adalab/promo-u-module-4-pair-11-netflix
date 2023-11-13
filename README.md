@@ -25,34 +25,34 @@ Por favor marca a continuación los ejercicios que hayáis terminado:
 
 **4.4 Node JS:**
 
-- [ ] 1. Descarga el proyecto
-- [ ] 2. Arranca el backend
-- [ ] 3. Arranca el front end
-- [ ] 4. Prueba el proyecto
-- [ ] 5. Entiende el código del proyecto
+- [x] 1. Descarga el proyecto
+- [x] 2. Arranca el backend
+- [x] 3. Arranca el front end
+- [x] 4. Prueba el proyecto
+- [x] 5. Entiende el código del proyecto
 
 **4.5 Express JS I:**
 
-- [ ] 1. Pide todas las películas
+- [x] 1. Pide todas las películas
 
 **4.6 Express JS II:**
 
-- [ ] 1. Filtrar por género
+- [x] 1. Filtrar por género
 - [ ] 2. Ordenar por nombre
 - [ ] 3. Login
 - [ ] 4. Bonus: Mantén logueada a la usuaria
 
 **4.7 Express JS III:**
 
-- [ ] 1. Servidor de estáticos para React
-- [ ] 2. Servidor de estáticos para las fotos
-- [ ] 3. Crea un motor de plantillas
+- [x] 1. Servidor de estáticos para React
+- [x] 2. Servidor de estáticos para las fotos
+- [x] 3. Crea un motor de plantillas
 
-  - [ ] 1. Obtener el id de la película a renderizar
-  - [ ] 2. Obtener la película
+  - [x] 1. Obtener el id de la película a renderizar
+  - [x] 2. Obtener la película
   - [ ] 3. Renderiza una página cualquiera
-  - [ ] 4. Renderiza la película
-  - [ ] 5. Añade estilos
+  - [x] 4. Renderiza la película
+  - [x] 5. Añade estilos
 
 **4.8 Mongo I:**
 

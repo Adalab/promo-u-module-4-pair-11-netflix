@@ -99,17 +99,19 @@ server.post('/sign-up', async (req, res) => {
   //encriptar la contraseña
   const passwordHashed = await bcrypt.hash(password, 10); //aumentar la seguridad de contraseña encriptada
   // prepara la consulta sql
-  const sql = 'INSERT INTO users( password, email, name) VALUES (?, ? ,?)';
-  const conn = await getConnection();
-
-  const [results] = await conn.query(sql, [passwordHashed, email, username]);
+  const sql =
+    "INSERT INTO users( password, email, name) VALUES (?, ? ,?)";
+  const conn = await getConnection(); 
+  const [results] = await conn.query(sql, [passwordHashed, email, username]);  
   conn.end();
   res.json({
     success: true,
     id: results.insertId,
   });
 });
-//servidor de estáticos
+
+
+ //servidor de estáticos
 const staticServerPath = './web/dist';
 server.use(express.static(staticServerPath));
 
