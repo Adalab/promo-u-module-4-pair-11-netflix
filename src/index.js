@@ -116,32 +116,89 @@ server.post('/sign-up', async (req, res) => {
   });
 });
 
+//login
+const generateToken = (payload) => {
+  const token = jwt.sign(payload, 'secreto', { expiresIn: '1h' });
+    return token;
+  };
+  
+  const verifyToken = (token) => {
+    try {
+      const decoded = jwt.verify(token, 'secreto');
+      return decoded;
+    } catch (err) {
+      return null;
+    }
+  };
+  
+server.post("/login", async (request, response) => {
+  //recibe el cuerpo de la solicitud, que debería contener el nombre de usuario y la contraseña.
+  const body = request.body;
+  //Buscar si el usuario existe en la bases de datos
+  const sql = "SELECT * FROM users WHERE email= ?";
+  const connection = await getConnection();
+  const [users] = await connection.query(sql, [body.email]);
+  connection.end();
 
-server.post('/login', async (req, res) => {
-// console.log(req.body);
-const password = req.body.password;
-const email = req.body.email;
+  const user = users[0]; //como select siempre me devuelve un listado, me quedo con el primer usuario que cumple la condicion
 
-  const sql =
-    "SELECT * FROM users WHERE email=? AND password=?";
-    console.log(req.body);
-  const conn = await getConnection(); 
-  const [results] = await conn.query(sql, [password, email]);  
-  conn.end();
+  //Comprueba si el usuario existe y si la contraseña proporcionada es correcta utilizando bcrypt.compare.
+  const passwordCorrect =
+    user === null
+      ? false
+      : await bcrypt.compare(body.password, user.password);
 
-  res.json({
-    success: true,
-    id: results.insertId,
-    message: 'te has logueado'
-  });
+  //Si el usuario no existe o la contraseña es incorrecta, responde con un estado 401 y un mensaje de error.
+  if (!(user && passwordCorrect)) {
+    return response.status(401).json({
+      success:false,
+      error: "Credenciales inválidas",
+    });
+  }
+
+  //Si las credenciales son correctas, se prepara un objeto userForToken que incluye el username y el id del usuario.
+  const userForToken = {
+    username: user.username,
+    id: user.id,
+  };
+
+  //Crear el token para enviar al front
+  const token = generateToken(userForToken);
+
+  //Finalmente, si todo es correcto, la función responde con un estado 200 y envía un objeto JSON con el token, el nombre de usuario y el nombre real del usuario.
+  response
+    .status(200)
+    .json({ token, username: user.username, name: user.name });
 });
+
+
+
+
+// server.post('/login', async (req, res) => {
+// // console.log(req.body);
+// const password = req.body.password;
+// const email = req.body.email;
+// const passwordHashed = await bcrypt.hash(password, 10); 
+
+//   const sql =
+//     "SELECT * FROM users WHERE email=? AND password=?";
+//     console.log(req.body);
+//   const conn = await getConnection(); 
+//   const [results] = await conn.query(sql, [email, passwordHashed]);  
+//   conn.end();
+
+//   res.json({
+//     success: true,
+//     message: 'te has logueado'
+//   });
+// });
 
 
 
 
 
  //servidor de estáticos
-const staticServerPath = './web/dist';
+const staticServerPath = './src/public-react';
 server.use(express.static(staticServerPath));
 
 const pathImgServer = './src/public-movies-images/';
