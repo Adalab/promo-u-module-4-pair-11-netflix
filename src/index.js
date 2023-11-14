@@ -9,7 +9,7 @@ server.use(cors());
 server.use(express.json());
 
 // importar y ejecutar la conexion de mongo
-const dbConnect = require('../config/connection');
+const dbConnect = require('./config/conexion');
 dbConnect();
 
 //Instalar y configuar EL JWT y bcrypt
@@ -97,22 +97,45 @@ server.get('/movies/:movieId', async (req, res) => {
 //Proceso de registro
 //usuario, contraseña, email, nombre....
 server.post('/sign-up', async (req, res) => {
-  const username = req.body.name;
+  const name = req.body.name;
   const password = req.body.password;
   const email = req.body.email;
+  const user = req.body.user;
   //encriptar la contraseña
   const passwordHashed = await bcrypt.hash(password, 10); //aumentar la seguridad de contraseña encriptada
   // prepara la consulta sql
   const sql =
     "INSERT INTO users(user, password, email, name, plan_details) VALUES (?, ? ,?, ?, ?)"; //nos daba error porque nos faltaban pasar parametros user y plan_detail, porque eran obligatorios
   const conn = await getConnection(); 
-  const [results] = await conn.query(sql, [email, passwordHashed, email, username, "Standard"]);  // hemos vuelto a pasar email como valor para no tener que inventar en el post un nuevo valor, y "Standard" es un valor fijo que es obligatorio
+  const [results] = await conn.query(sql, [user, passwordHashed, email, name, "Standard"]);  // hemos vuelto a pasar email como valor para no tener que inventar en el post un nuevo valor, y "Standard" es un valor fijo que es obligatorio
   conn.end();
   res.json({
     success: true,
     id: results.insertId,
+    message: 'nuevo id añadido'
   });
 });
+
+
+server.post('/login', async (req, res) => {
+// console.log(req.body);
+const password = req.body.password;
+const email = req.body.email;
+
+  const sql =
+    "SELECT * FROM users WHERE email=? AND password=?";
+    console.log(req.body);
+  const conn = await getConnection(); 
+  const [results] = await conn.query(sql, [password, email]);  
+  conn.end();
+
+  res.json({
+    success: true,
+    id: results.insertId,
+    message: 'te has logueado'
+  });
+});
+
 
 
 
